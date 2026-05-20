@@ -19,7 +19,75 @@ Game data files are in a separate repository under a different license: https://
 
 ## Windows
 
-Download here: https://www.franticware.com/openmrac
+
+Create new folder "OpenMRac"
+
+Open the folder you created in the terminal.
+
+
+I have created a CMakeLists.txt file inside /src to configure our build and include all the required libraries in this project.
+
+
+**Prerequisites:**
+* [CMake](https://cmake.org)
+* [Msys2](https://www.msys2.org)
+* [Ninja](https://ninja-build.org)    ```winget install Ninja-build.Ninja```  
+
+**Let's install our libraries**
+
+* Open msys2 Shell
+```
+pacman -S mingw-w64-x86_64-toolchain
+pacman -S mingw-w64-x86_64-SDL2
+pacman -S mingw-w64-x86_64-glew
+pacman -S mingw-w64-x86_64-zlib
+pacman -S mingw-w64-x86_64-libpng
+pacman -S mingw-w64-x86_64-libjpeg-turbo
+pacman -S mingw-w64-x86_64-openal
+pacman -S mingw-w64-x86_64-glm
+```
+
+**We'll need these later to build our dat file (Game data)**
+```
+pacman -S make tar coreutils findutils gawk sox
+```
+
+**Let's build our executable**
+```
+git clone https://github.com/Franticware/OpenMRac.git
+cd openmrac/src
+
+
+cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+cmake --build build
+```
+* The game file will be in "\OpenMRac\OpenMRac\src\build\bin\OpenMRac.exe"
+
+**Let's build our Data**
+
+We don't need to do any converting we just need to run make to execute our makefile in "\OpenMRac\OpenMRac-data\"
+
+* Open Mingw64 shell
+```
+cd [RelativePathTo OpenMRac-data]
+
+make
+```
+This will create our .dat file (openmrac.dat), copy the generated file to "\OpenMRac\OpenMRac\src\build\bin\"
+
+**Copy DLLs**
+
+Since our executable is dynamically linked against our libraries; we need to copy some dlls to the executable folder
+* SDL2.dll
+* glew32.dll
+* libopenal-1.dll/openal32.dll
+* libwinpthread-1
+* libstdc++-6
+* libpng16-16
+* libjpeg-8
+* libgcc_s_seh-1
+
+
 
 ## Linux
 
@@ -46,6 +114,8 @@ cd OpenMRac/src
 make -f Makefile.linux install
 cd ../..
 ```
+
+## Windows
 
 ## Mac OS X
 TODO
