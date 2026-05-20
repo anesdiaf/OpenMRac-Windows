@@ -38,6 +38,7 @@ I have created a CMakeLists.txt file inside /src to configure our build and incl
 * Open msys2 Shell
 ```
 pacman -S mingw-w64-x86_64-toolchain
+pacman -S --needed mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja
 pacman -S mingw-w64-x86_64-SDL2
 pacman -S mingw-w64-x86_64-glew
 pacman -S mingw-w64-x86_64-zlib
