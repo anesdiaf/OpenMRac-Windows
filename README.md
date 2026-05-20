@@ -53,12 +53,15 @@ pacman -S make tar coreutils findutils gawk sox
 ```
 
 **Let's build our executable**
+
+* Open Mingw64 shell (This is important because we are using g++ and gcc as a compiler-driver)
+
 ```
 git clone https://github.com/Franticware/OpenMRac.git
 cd openmrac/src
 
 
-cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+cmake -S . -B build -G Ninja
 cmake --build build
 ```
 * The game file will be in "\OpenMRac\OpenMRac\src\build\bin\OpenMRac.exe"
