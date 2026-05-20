@@ -14,7 +14,7 @@
 
 #include "glm1.h"
 
-SDL_Window* gameWindow = 0;
+SDL_Window *gameWindow = 0;
 
 int ge_bpass1 = 1;
 
@@ -30,7 +30,7 @@ float far_plane = 80.f;
 
 //////////// funkce pro Carcam
 
-void Carcam::init(float r, float y, float ang, float h_ang, const float* angp, const float* ang0p, const float* pos0, const TimeSync* timesync, const Collider* collider)
+void Carcam::init(float r, float y, float ang, float h_ang, const float *angp, const float *ang0p, const float *pos0, const TimeSync *timesync, const Collider *collider)
 {
     p_ang = p_ang0 = ang;
     p_r = r;
@@ -52,54 +52,57 @@ void Carcam::update(bool bstep)
     {
         if (p_ang < *p_ang_base)
         {
-            p_ang += speed*sqrtf(*p_ang_base-p_ang)*p_timesync->p_T;
+            p_ang += speed * sqrtf(*p_ang_base - p_ang) * p_timesync->p_T;
             if (p_ang > *p_ang_base)
                 p_ang = *p_ang_base;
         }
         else if (p_ang > *p_ang_base)
         {
-            p_ang -= speed*sqrtf(p_ang-*p_ang_base)*p_timesync->p_T;
+            p_ang -= speed * sqrtf(p_ang - *p_ang_base) * p_timesync->p_T;
             if (p_ang < *p_ang_base)
                 p_ang = *p_ang_base;
         }
-        if (p_ang > *p_ang_base+M_PI)
-            p_ang -= 2.f*M_PI;
-        else if (p_ang < *p_ang_base-M_PI)
-            p_ang += 2.f*M_PI;
-    } else { // interpolace přes vypočtenou rychlost podle polohy času uvnitř kroku
+        if (p_ang > *p_ang_base + M_PI)
+            p_ang -= 2.f * M_PI;
+        else if (p_ang < *p_ang_base - M_PI)
+            p_ang += 2.f * M_PI;
+    }
+    else
+    { // interpolace přes vypočtenou rychlost podle polohy času uvnitř kroku
         if (p_ang < *p_ang0_base)
         {
-            p_ang0 = p_ang+speed*sqrtf(*p_ang0_base-p_ang)*p_timesync->p_prevT;
+            p_ang0 = p_ang + speed * sqrtf(*p_ang0_base - p_ang) * p_timesync->p_prevT;
             if (p_ang0 > *p_ang0_base)
                 p_ang0 = *p_ang0_base;
         }
         else if (p_ang > *p_ang0_base)
         {
-            p_ang0 = p_ang-speed*sqrtf(p_ang-*p_ang0_base)*p_timesync->p_prevT;
+            p_ang0 = p_ang - speed * sqrtf(p_ang - *p_ang0_base) * p_timesync->p_prevT;
             if (p_ang0 < *p_ang0_base)
                 p_ang0 = *p_ang0_base;
         }
 
         p_r0 = p_r; // zmenšit podle kolizí
 
-        float r0_pom = p_r0+p_mindist;
+        float r0_pom = p_r0 + p_mindist;
         float vect0_base[2] = {-cosf(-p_ang0), sinf(-p_ang0)}; // jednotkový vektor
-        float vect0[2] = {vect0_base[0]*r0_pom, vect0_base[1]*r0_pom};
+        float vect0[2] = {vect0_base[0] * r0_pom, vect0_base[1] * r0_pom};
 
         float pos0_base_kolmy_posun = 0.15f;
-        float pos0_base_pom0[2] = {p_pos0_base[0]+vect0_base[1]*pos0_base_kolmy_posun, p_pos0_base[1]-vect0_base[0]*pos0_base_kolmy_posun};
-        float pos0_base_pom1[2] = {p_pos0_base[0]-vect0_base[1]*pos0_base_kolmy_posun, p_pos0_base[1]+vect0_base[0]*pos0_base_kolmy_posun};
-        float* pos0_base_pom[2] = {pos0_base_pom0, pos0_base_pom1};
+        float pos0_base_pom0[2] = {p_pos0_base[0] + vect0_base[1] * pos0_base_kolmy_posun, p_pos0_base[1] - vect0_base[0] * pos0_base_kolmy_posun};
+        float pos0_base_pom1[2] = {p_pos0_base[0] - vect0_base[1] * pos0_base_kolmy_posun, p_pos0_base[1] + vect0_base[0] * pos0_base_kolmy_posun};
+        float *pos0_base_pom[2] = {pos0_base_pom0, pos0_base_pom1};
 
         bool bintersect = false;
         float intersect_i = 0.f;
-        int segm_n = int(floor(r0_pom/(p_collider->p_r*2.f)))+1;
-        if (segm_n < 1) segm_n = 1;
+        int segm_n = int(floor(r0_pom / (p_collider->p_r * 2.f))) + 1;
+        if (segm_n < 1)
+            segm_n = 1;
         int colg_i_prev = -1;
         for (int i = 0; i != segm_n; ++i)
         {
-            float r0_m = (float(i)+0.5f)*(r0_pom)/float(segm_n); // poloměr středu pro kolizní čtverec
-            float stredg[2] = {vect0_base[0]*r0_m+p_pos0_base[0], vect0_base[1]*r0_m+p_pos0_base[1]};
+            float r0_m = (float(i) + 0.5f) * (r0_pom) / float(segm_n); // poloměr středu pro kolizní čtverec
+            float stredg[2] = {vect0_base[0] * r0_m + p_pos0_base[0], vect0_base[1] * r0_m + p_pos0_base[1]};
             int colg_i = p_collider->get_subg(stredg);
             if (colg_i != -1 && colg_i_prev != colg_i)
             {
@@ -117,7 +120,9 @@ void Carcam::update(bool bstep)
                             if (!bintersect)
                             {
                                 intersect_i = int_res[1];
-                            } else {
+                            }
+                            else
+                            {
                                 intersect_i = std::min(intersect_i, int_res[1]);
                             }
                             bintersect = true;
@@ -141,14 +146,14 @@ glm::mat4 Carcam::transf()
 {
     glm::mat4 ret = glm::rotate(glm::mat4(1.f), glm::radians(-p_h_ang), glm::vec3(1.f, 0.f, 0.f));
     ret = glm::translate(ret, glm::vec3(0, 0, -p_r0));
-    ret = glm::rotate(ret, glm::radians(-p_ang0*57.29577951308232f+180.f), glm::vec3(0.f, 1.f, 0.f));
+    ret = glm::rotate(ret, glm::radians(-p_ang0 * 57.29577951308232f + 180.f), glm::vec3(0.f, 1.f, 0.f));
     ret = glm::translate(ret, glm::vec3(-p_pos0_base[1], -p_y, -p_pos0_base[0]));
     return ret;
 }
 
 //////////// end Carcam
 
-bool playerstate_comp(const Playerstate& a, const Playerstate& b)
+bool playerstate_comp(const Playerstate &a, const Playerstate &b)
 {
     if (a.state_finish)
     {
@@ -181,8 +186,8 @@ void Gamemng::end_race()
     p_results.best.puts(0, "\n\n\n");
 
     Playerstate playerstate[4];
-    std::copy(p_playerstate, p_playerstate+p_players, playerstate);
-    std::stable_sort(playerstate, playerstate+p_players, playerstate_comp);
+    std::copy(p_playerstate, p_playerstate + p_players, playerstate);
+    std::stable_sort(playerstate, playerstate + p_players, playerstate_comp);
 
     float time_no_1 = 0.f;
 
@@ -191,7 +196,9 @@ void Gamemng::end_race()
         if (time_no_1 == 0.f)
         {
             time_no_1 = playerstate[i].best_time;
-        } else {
+        }
+        else
+        {
             if (playerstate[i].best_time != 0.f)
             {
                 if (playerstate[i].best_time < time_no_1)
@@ -207,13 +214,13 @@ void Gamemng::end_race()
         char buff[256] = {0};
         if (playerstate[i].state_finish)
         {
-            snprintf(buff, 255, "%u. Player %d", i+1, playerstate[i].player+1);
+            snprintf(buff, 255, "%u. Player %d", i + 1, playerstate[i].player + 1);
             float font_color[4] = {1, 1, 1, 1};
             p_results.position.set_color(i, font_color);
         }
         else
         {
-            snprintf(buff, 255, "DNF Player %d", playerstate[i].player+1);
+            snprintf(buff, 255, "DNF Player %d", playerstate[i].player + 1);
             float font_color[4] = {0.6, 0.6, 0.6, 1};
             p_results.position.set_color(i, font_color);
         }
@@ -226,7 +233,9 @@ void Gamemng::end_race()
         {
             float font_color[4] = {1, 1, 1, 1};
             p_results.best.set_color(i, font_color);
-        } else {
+        }
+        else
+        {
             float font_color[4] = {0.6, 0.6, 0.6, 1};
             p_results.best.set_color(i, font_color);
         }
@@ -236,13 +245,16 @@ void Gamemng::end_race()
 void Gamemng::set_far(int far1)
 {
     int far_max = 10;
-    if (far1 < 0) far1 = 0; else if (far1 > far_max) far1 = far_max;
+    if (far1 < 0)
+        far1 = 0;
+    else if (far1 > far_max)
+        far1 = far_max;
     p_far = far1;
 
     float far0 = 60.f;
     float far10 = 200.f;
 
-    float ffar = far0 + (far10-far0)*far1/float(far_max);
+    float ffar = far0 + (far10 - far0) * far1 / float(far_max);
     p_frust[3] = ffar;
     set_proj_mtrx();
     float frustum[6] = {-p_frust[0], p_frust[0], -p_frust[1], p_frust[1], p_frust[2], p_frust[3]};
@@ -274,7 +286,8 @@ void Gamemng::init_sound()
 
 void Gamemng::unset_scissor()
 {
-    glDisable(GL_SCISSOR_TEST); checkGL();
+    glDisable(GL_SCISSOR_TEST);
+    checkGL();
     p_shadermng.set(ShaderUniMat4::ProjMat, p_proj_mtrx0);
     p_proj_mtrx_active = p_proj_mtrx0;
 }
@@ -283,16 +296,21 @@ void Gamemng::set_scissor(int player)
 {
     if (p_players > 1)
     {
-        glEnable(GL_SCISSOR_TEST); checkGL();
+        glEnable(GL_SCISSOR_TEST);
+        checkGL();
     }
     switch (p_players)
     {
     case 2:
         if (player == 0)
         {
-            glScissor(0, 0, p_viewport[0], p_scissor[1]); checkGL();
-        } else { // if (player == 1)
-            glScissor(0, p_scissor[1], p_viewport[0], p_scissor[1]); checkGL();
+            glScissor(0, 0, p_viewport[0], p_scissor[1]);
+            checkGL();
+        }
+        else
+        { // if (player == 1)
+            glScissor(0, p_scissor[1], p_viewport[0], p_scissor[1]);
+            checkGL();
         }
         break;
     case 3:
@@ -300,16 +318,20 @@ void Gamemng::set_scissor(int player)
         switch (player)
         {
         case 0:
-            glScissor(0, 0, p_scissor[0], p_scissor[1]); checkGL();
+            glScissor(0, 0, p_scissor[0], p_scissor[1]);
+            checkGL();
             break;
         case 1:
-            glScissor(0, p_scissor[1], p_scissor[0], p_scissor[1]); checkGL();
+            glScissor(0, p_scissor[1], p_scissor[0], p_scissor[1]);
+            checkGL();
             break;
         case 2:
-            glScissor(p_scissor[0], 0, p_scissor[0], p_scissor[1]); checkGL();
+            glScissor(p_scissor[0], 0, p_scissor[0], p_scissor[1]);
+            checkGL();
             break;
         case 3:
-            glScissor(p_scissor[0], p_scissor[1], p_scissor[0], p_scissor[1]); checkGL();
+            glScissor(p_scissor[0], p_scissor[1], p_scissor[0], p_scissor[1]);
+            checkGL();
             break;
         }
     }
@@ -318,13 +340,13 @@ void Gamemng::set_scissor(int player)
     p_proj_mtrx_active = p_proj_mtrx[player];
 }
 
-void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_def, const char* skies_def)
+void Gamemng::init(const char *maps_def, const char *objs_def, const char *cars_def, const char *skies_def)
 {
     {
         static const float vert_array[12] = {-20, -10, -10,
                                              20, -10, -10,
-                                             -20,  10, -10,
-                                              20,  10, -10};
+                                             -20, 10, -10,
+                                             20, 10, -10};
         GLuint tmpBuf;
         glGenBuffers(1, &tmpBuf);
         p_blackBuf = tmpBuf;
@@ -334,11 +356,35 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
     }
     {
         static const float vert_array[28] = {
-                                            -10, -10, -10,  0, 1, 0.2, 1,
-                                            10, -10, -10,   0, 1, 0.2, 1,
-                                            -10, 10, -10,   1, 0, 0.2, 1,
-                                            10, 10, -10,    1, 0, 0.2, 1,
-                                            };
+            -10,
+            -10,
+            -10,
+            0,
+            1,
+            0.2,
+            1,
+            10,
+            -10,
+            -10,
+            0,
+            1,
+            0.2,
+            1,
+            -10,
+            10,
+            -10,
+            1,
+            0,
+            0.2,
+            1,
+            10,
+            10,
+            -10,
+            1,
+            0,
+            0.2,
+            1,
+        };
         GLuint tmpBuf;
         glGenBuffers(1, &tmpBuf);
         p_brickBuf = tmpBuf;
@@ -356,37 +402,44 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
     {
         uint32_t white_pix[256];
         GLuint texTmp;
-        glGenTextures(1, &texTmp); checkGL();
+        glGenTextures(1, &texTmp);
+        checkGL();
         p_whitetex = texTmp;
         memset(white_pix, 0xff, 256 * 4);
-        glBindTexture(GL_TEXTURE_2D, p_whitetex); checkGL();
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, white_pix); checkGL();
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); checkGL();
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); checkGL();
-        glBindTexture(GL_TEXTURE_2D, 0); checkGL();
+        glBindTexture(GL_TEXTURE_2D, p_whitetex);
+        checkGL();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, white_pix);
+        checkGL();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        checkGL();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        checkGL();
+        glBindTexture(GL_TEXTURE_2D, 0);
+        checkGL();
     }
     GLint viewport_pom[4];
-    glGetIntegerv(GL_VIEWPORT, viewport_pom); checkGL();
+    glGetIntegerv(GL_VIEWPORT, viewport_pom);
+    checkGL();
     p_viewport[0] = viewport_pom[2];
     p_viewport[1] = viewport_pom[3];
-    p_scissor[0] = p_viewport[0]/2;
-    p_scissor[1] = p_viewport[1]/2;
-    p_aspect = float(p_viewport[0])/float(p_viewport[1]);
+    p_scissor[0] = p_viewport[0] / 2;
+    p_scissor[1] = p_viewport[1] / 2;
+    p_aspect = float(p_viewport[0]) / float(p_viewport[1]);
     p_aspect = std::max(p_aspect, 1.25f);
-    p_aspect = std::min(p_aspect, 16.f/9.f);
-    p_wide169 = (1.6f + 16.f/9.f)*0.5f < p_aspect;
+    p_aspect = std::min(p_aspect, 16.f / 9.f);
+    p_wide169 = (1.6f + 16.f / 9.f) * 0.5f < p_aspect;
 
-    float ang_h_base = 70.f  * 0.0174532925199433f; // horizontální základ úhlu
-    float frust_h_base = tanf(ang_h_base*0.5f);
-    float asp_base = 4.f/3.f;
-    float s_base = frust_h_base*frust_h_base/asp_base;
-    p_frust[0] = sqrtf(s_base*p_aspect);
-    p_frust[1] = p_frust[0]/p_aspect;
+    float ang_h_base = 70.f * 0.0174532925199433f; // horizontální základ úhlu
+    float frust_h_base = tanf(ang_h_base * 0.5f);
+    float asp_base = 4.f / 3.f;
+    float s_base = frust_h_base * frust_h_base / asp_base;
+    p_frust[0] = sqrtf(s_base * p_aspect);
+    p_frust[1] = p_frust[0] / p_aspect;
     p_frust[2] = 0.1f;
     p_frust[3] = far_plane;
 
-    p_fpscoord[1] = 0.767039/p_frust[0]*15.f;
-    p_fpscoord[0] = -p_aspect*p_fpscoord[1];
+    p_fpscoord[1] = 0.767039 / p_frust[0] * 15.f;
+    p_fpscoord[0] = -p_aspect * p_fpscoord[1];
 
     char buff[1024] = {0};
     if (gbuff_in.f_open(maps_def, "r"))
@@ -402,7 +455,7 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
                 gamemap.filename_tex[0] = gamemap.filename_tex[255] = 0;
                 gamemap.name[0] = gamemap.name[255] = 0;
                 sscanf(buff, "%255s %f %f %255s %255s", gamemap.filename, &(gamemap.light_ah), &(gamemap.light_av),
-                    gamemap.filename_tex, gamemap.name);
+                       gamemap.filename_tex, gamemap.name);
                 if (strcmp(gamemap.filename, "/*") == 0) // zahození zbytku souboru
                     break;
                 for (unsigned int i = 0; i < strlen(gamemap.name); ++i)
@@ -445,11 +498,14 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
                 gamecar.fname_sample_engine1[0] = gamecar.fname_sample_engine1[255] = 0;
                 gamecar.name[0] = gamecar.name[255] = 0;
                 sscanf(buff, "%255s %255s %255s %255s %f %f %f %f %f %f %f %255s", gamecar.filename, gamecar.filename_cmo,
-                    gamecar.fname_sample_engine0, gamecar.fname_sample_engine1, &gamecar.engine1_pitch,
-                    &gamecar.exhaust_position[0], &gamecar.exhaust_position[1], &gamecar.exhaust_position[2],
-                    &gamecar.exhaust_direction[0], &gamecar.exhaust_direction[1], &gamecar.exhaust_direction[2],
-                    gamecar.name);
-                glm::normalize(gamecar.exhaust_direction);
+                       gamecar.fname_sample_engine0, gamecar.fname_sample_engine1, &gamecar.engine1_pitch,
+                       &gamecar.exhaust_position[0], &gamecar.exhaust_position[1], &gamecar.exhaust_position[2],
+                       &gamecar.exhaust_direction[0], &gamecar.exhaust_direction[1], &gamecar.exhaust_direction[2],
+                       gamecar.name);
+                if (glm::length(gamecar.exhaust_direction) > 0.00001f)
+                {
+                    gamecar.exhaust_direction = glm::normalize(gamecar.exhaust_direction);
+                }
                 for (unsigned int i = 0; i < strlen(gamecar.name); ++i)
                 {
                     if (gamecar.name[i] == '_')
@@ -459,16 +515,19 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
             }
         }
         gbuff_in.fclose();
-        for (unsigned int i = 0; i != p_cars.size(); ++i) {
+        for (unsigned int i = 0; i != p_cars.size(); ++i)
+        {
             gbuff_in.f_open(p_cars[i].fname_sample_engine0, "rb");
-            alGenBuffers(1, &(p_cars[i].p_engine0_sample)); global_al_buffers.push_back(p_cars[i].p_engine0_sample);
+            alGenBuffers(1, &(p_cars[i].p_engine0_sample));
+            global_al_buffers.push_back(p_cars[i].p_engine0_sample);
             swapArrayLE16(gbuff_in.fbuffptr(), gbuff_in.fbuffsz());
             tweakLoop(gbuff_in.fbuffptr(), gbuff_in.fbuffsz());
             alBufferData(p_cars[i].p_engine0_sample, AL_FORMAT_MONO16, gbuff_in.fbuffptr(), gbuff_in.fbuffsz(), 22050);
             gbuff_in.fclose();
 
             gbuff_in.f_open(p_cars[i].fname_sample_engine1, "rb");
-            alGenBuffers(1, &(p_cars[i].p_engine1_sample)); global_al_buffers.push_back(p_cars[i].p_engine1_sample);
+            alGenBuffers(1, &(p_cars[i].p_engine1_sample));
+            global_al_buffers.push_back(p_cars[i].p_engine1_sample);
             swapArrayLE16(gbuff_in.fbuffptr(), gbuff_in.fbuffsz());
             tweakLoop(gbuff_in.fbuffptr(), gbuff_in.fbuffsz());
             alBufferData(p_cars[i].p_engine1_sample, AL_FORMAT_MONO16, gbuff_in.fbuffptr(), gbuff_in.fbuffsz(), 22050);
@@ -492,7 +551,7 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
                 p_cars[i].names.clear();
                 if (p_cars[i].sz_names > 0)
                 {
-                    p_cars[i].names.resize((p_cars[i].sz_names)*p_cars[i].pict_tex.size());
+                    p_cars[i].names.resize((p_cars[i].sz_names) * p_cars[i].pict_tex.size());
                 }
                 for (unsigned int j = 0; j != p_cars[i].pict_tex.size(); ++j)
                     p_cars[i].pict_tex[j].tex = 0;
@@ -502,22 +561,23 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
                     uncomment(buff);
                     int start_char = 0;
                     float car_color[3] = {0.6, 0.6, 0.6};
-                    sscanf(buff, "%f %f %f%n", car_color+0, car_color+1, car_color+2, &start_char);
+                    sscanf(buff, "%f %f %f%n", car_color + 0, car_color + 1, car_color + 2, &start_char);
                     p_cars[i].pict_tex[j].color[0] = car_color[0];
                     p_cars[i].pict_tex[j].color[1] = car_color[1];
                     p_cars[i].pict_tex[j].color[2] = car_color[2];
                     p_cars[i].pict_tex[j].color[3] = 1.f;
                     if (!strempty(buff))
                     {
-                        char * pch = strtok(buff+start_char, " \n\t\r");
+                        char *pch = strtok(buff + start_char, " \n\t\r");
                         int k = 0;
-                        while (pch != NULL && k != int(p_cars[i].sz_names+1))
+                        while (pch != NULL && k != int(p_cars[i].sz_names + 1))
                         {
                             if (k >= 1)
                             {
-                                p_cars[i].names[j*p_cars[i].sz_names+k-1] = pch;
+                                p_cars[i].names[j * p_cars[i].sz_names + k - 1] = pch;
                             }
-                            else {
+                            else
+                            {
                                 strncpy(p_cars[i].pict_tex[j].fname, pch, 255);
                             } // načti texturu pch
 
@@ -543,7 +603,7 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
                 gamesky.sky_tex[0] = gamesky.sky_tex[255] = '\0';
                 gamesky.skycm_tex[0] = gamesky.skycm_tex[255] = '\0';
                 sscanf(buff, "%255s %255s %f %f %f %f %f %f", gamesky.sky_tex, gamesky.skycm_tex,
-                    gamesky.light_amb, gamesky.light_amb+1, gamesky.light_amb+2, gamesky.light_diff, gamesky.light_diff+1,gamesky.light_diff+2);
+                       gamesky.light_amb, gamesky.light_amb + 1, gamesky.light_amb + 2, gamesky.light_diff, gamesky.light_diff + 1, gamesky.light_diff + 2);
                 gamesky.light_amb[3] = 1;
                 gamesky.light_diff[3] = 1;
                 p_skies.push_back(gamesky);
@@ -591,9 +651,9 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
     p_results.position.init(20, 4, 1.5f, -1, -1, &p_glfont, font_color);
     p_results.position.set_pos(-8.f, 7.f);
     p_results.position.puts(0, "1. Player 1\n"
-                            "2. Player 2\n"
-                            "DNF Player 3\n"
-                            "DNF Player 4");
+                               "2. Player 2\n"
+                               "DNF Player 3\n"
+                               "DNF Player 4");
 
     p_results.time.init(20, 4, 1.5f, -1, -1, &p_glfont, font_color);
     p_results.time.set_pos(2.7f, 7.f);
@@ -618,25 +678,26 @@ void Gamemng::init(const char* maps_def, const char* objs_def, const char* cars_
     p_sound_game_static.init();
 
     p_ghostOld = std::make_unique<Ghost>();
-    p_ghostNew.clear(); p_ghostNew.resize(4);
+    p_ghostNew.clear();
+    p_ghostNew.resize(4);
 
     p_particles.resize(4);
 }
 
-void Gamemng::input(unsigned char keys[4*4])
+void Gamemng::input(unsigned char keys[4 * 4])
 {
     for (unsigned int i = 0; i != p_players; ++i)
     {
-        p_playerkeys[i].key_up    = keys[i*4+0];
-        p_playerkeys[i].key_down  = keys[i*4+1];
-        p_playerkeys[i].key_left  = keys[i*4+2];
-        p_playerkeys[i].key_right = keys[i*4+3];
+        p_playerkeys[i].key_up = keys[i * 4 + 0];
+        p_playerkeys[i].key_down = keys[i * 4 + 1];
+        p_playerkeys[i].key_left = keys[i * 4 + 2];
+        p_playerkeys[i].key_right = keys[i * 4 + 3];
     }
 }
 
-const char* time_m_s(float time)
+const char *time_m_s(float time)
 {
-    int time_min = int(time/60.f);
+    int time_min = int(time / 60.f);
     float time_sec = fmod(time, 60.f);
     static char timebuf[15] = {0};
     snprintf(timebuf, 14, "%d:%05.2f", time_min, time_sec);
@@ -651,7 +712,7 @@ void Gamemng::init_keytest()
     char controlBuffer[1024] = {0};
     for (int i = 0; i != 4; ++i)
     {
-        snprintf(buff, 63, "Player %d", i+1);
+        snprintf(buff, 63, "Player %d", i + 1);
         p_keytest[i].player.init(25, 1, 2.f, 0, 0, &p_glfont, font_color1);
         p_keytest[i].player.set_pos(0.f, 6.f);
         p_keytest[i].player.puts(0, buff);
@@ -681,7 +742,7 @@ void Gamemng::init_keytest()
 void Gamemng::init_hud()
 {
     float font_color[4] = {1, 1, 1, 1};
-    p_gltext_fps.init(20, 1, 800.f/p_viewport[1]*0.5f /*5*/, 1, -1, &p_glfont, font_color);
+    p_gltext_fps.init(20, 1, 800.f / p_viewport[1] * 0.5f /*5*/, 1, -1, &p_glfont, font_color);
     p_gltext_fps.set_pos(p_fpscoord[0], p_fpscoord[1]);
 
     const float guiShift = p_wide169 ? 1.f : 0.f;
@@ -729,11 +790,11 @@ void Gamemng::init_hud()
         p_playerhud[i].newrecord.puts(0, "New Lap Record!");
     }
 
-    p_gltext_start.init(10, 1, 1.f/*velikost textu*/, 0, 0, &p_glfont, font_color);
+    p_gltext_start.init(10, 1, 1.f /*velikost textu*/, 0, 0, &p_glfont, font_color);
     p_gltext_start.set_pos(0.f, 0.f);
 }
 
-void Gamemng::render_smoke(const glm::mat4& m)
+void Gamemng::render_smoke(const glm::mat4 &m)
 {
     // 3.fáze renderu aut - render částic
     static const float texCoords[8] = {0, 0, 1, 0, 1, 1, 0, 1};
@@ -759,7 +820,7 @@ void Gamemng::render_smoke(const glm::mat4& m)
 
             for (unsigned int j = 0; j != p_particles[i].m_particleContainer.size(); ++j)
             {
-                Particle& particle = p_particles[i].m_particleContainer[j];
+                Particle &particle = p_particles[i].m_particleContainer[j];
                 glm::vec3 result = mdl_mtrx * glm::vec4(particle.position[0], particle.position[1], particle.position[2], 1.f);
 
                 // 0
@@ -851,40 +912,53 @@ void Gamemng::render_smoke(const glm::mat4& m)
             glBufferData(GL_ARRAY_BUFFER, p_smokeCount * sizeof(float), 0, GL_DYNAMIC_DRAW);
         }
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertArray.size() * sizeof(float), vertArray.data());
-        glEnable(GL_BLEND); checkGL();
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); checkGL();
-        glBindTexture(GL_TEXTURE_2D, p_smoketex); checkGL();
-        glDepthMask(GL_FALSE); checkGL();
+        glEnable(GL_BLEND);
+        checkGL();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        checkGL();
+        glBindTexture(GL_TEXTURE_2D, p_smoketex);
+        checkGL();
+        glDepthMask(GL_FALSE);
+        checkGL();
         p_shadermng.set(ShaderUniMat4::ModelViewMat, glm::mat4(1.f));
         p_shadermng.use(ShaderId::ColorTex);
         p_shadermng.set(ShaderUniInt::AlphaDiscard, (GLint)0);
-        glEnableVertexAttribArray((GLuint)ShaderAttrib::Pos); checkGL();
-        glEnableVertexAttribArray((GLuint)ShaderAttrib::Tex); checkGL();
-        glEnableVertexAttribArray((GLuint)ShaderAttrib::Color); checkGL(); // smoke color array
-        glVertexAttribPointer((GLuint)ShaderAttrib::Pos, 3, GL_FLOAT, GL_FALSE, sizeof(float)*9, 0);
-        glVertexAttribPointer((GLuint)ShaderAttrib::Color, 4, GL_FLOAT, GL_FALSE, sizeof(float)*9, (void*)(sizeof(float)*3));
-        glVertexAttribPointer((GLuint)ShaderAttrib::Tex, 2, GL_FLOAT, GL_FALSE, sizeof(float)*9, (void*)(sizeof(float)*7));
-        glDrawArrays(GL_TRIANGLES, 0, vertArray.size()/9);
-        glDisableVertexAttribArray((GLuint)ShaderAttrib::Pos); checkGL();
-        glDisableVertexAttribArray((GLuint)ShaderAttrib::Tex); checkGL();
-        glDisableVertexAttribArray((GLuint)ShaderAttrib::Color); checkGL();
-        glDepthMask(GL_TRUE); checkGL();
-        glDisable(GL_BLEND); checkGL();
+        glEnableVertexAttribArray((GLuint)ShaderAttrib::Pos);
+        checkGL();
+        glEnableVertexAttribArray((GLuint)ShaderAttrib::Tex);
+        checkGL();
+        glEnableVertexAttribArray((GLuint)ShaderAttrib::Color);
+        checkGL(); // smoke color array
+        glVertexAttribPointer((GLuint)ShaderAttrib::Pos, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+        glVertexAttribPointer((GLuint)ShaderAttrib::Color, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void *)(sizeof(float) * 3));
+        glVertexAttribPointer((GLuint)ShaderAttrib::Tex, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void *)(sizeof(float) * 7));
+        glDrawArrays(GL_TRIANGLES, 0, vertArray.size() / 9);
+        glDisableVertexAttribArray((GLuint)ShaderAttrib::Pos);
+        checkGL();
+        glDisableVertexAttribArray((GLuint)ShaderAttrib::Tex);
+        checkGL();
+        glDisableVertexAttribArray((GLuint)ShaderAttrib::Color);
+        checkGL();
+        glDepthMask(GL_TRUE);
+        checkGL();
+        glDisable(GL_BLEND);
+        checkGL();
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 }
 
-void Gamemng::render_frame(const glm::mat4& m)
+void Gamemng::render_frame(const glm::mat4 &m)
 {
     p_shadermng.set(ShaderUniMat4::ModelViewMat, m);
     p_shadermng.set(ShaderUniVec4::LightPos, m * glm::vec4(p_light_position[0], p_light_position[1], p_light_position[2], p_light_position[3]));
 
     // vykreslení mapy
-    if (ge_bpass1)p_map_rendermng->render_o_pass1(glm::value_ptr(m)); // zjištění viditelnosti (octree)
-    p_map_rendermng->render_o_pass2(m); // vykreslení viditelných částí mapy
+    if (ge_bpass1)
+        p_map_rendermng->render_o_pass1(glm::value_ptr(m)); // zjištění viditelnosti (octree)
+    p_map_rendermng->render_o_pass2(m);                     // vykreslení viditelných částí mapy
 
     // vykreslení oblohy
-    glm::mat4 mdl_rot_mtrx = m; // zkopíruje se transformační matice
+    glm::mat4 mdl_rot_mtrx = m;                      // zkopíruje se transformační matice
     mdl_rot_mtrx[3] = glm::vec4(0.f, 0.f, 0.f, 1.f); // translační část se vynuluje (obloha se neposouvá, jen rotuje)
     glm::mat4 sky_mat = glm::rotate(mdl_rot_mtrx, glm::radians(p_skyang), glm::vec3(0, 1, 0));
     p_skysph.render(sky_mat);
@@ -896,27 +970,28 @@ void Gamemng::render_frame(const glm::mat4& m)
     // render objektů
     for (unsigned int i = 0; i != p_mapobjs.size(); ++i)
     {
-        Mapobj& mapobj = p_mapobjs[i];
+        Mapobj &mapobj = p_mapobjs[i];
 
         glm::mat4 mdl_mtrx = glm::translate(m, glm::vec3(mapobj.rbo->p_x0[1], 0.f, mapobj.rbo->p_x0[0]));
-        mdl_mtrx = glm::rotate(mdl_mtrx, glm::radians(mapobj.rbo->p_ax0*57.29577951308232f), glm::vec3(0, 1, 0));
+        mdl_mtrx = glm::rotate(mdl_mtrx, glm::radians(mapobj.rbo->p_ax0 * 57.29577951308232f), glm::vec3(0, 1, 0));
 
         p_shadermng.set(ShaderUniMat4::ModelViewMat, mdl_mtrx);
 
-        if (ge_bpass1)mapobj.rendermng->render_o_pass1(glm::value_ptr(mdl_mtrx));
+        if (ge_bpass1)
+            mapobj.rendermng->render_o_pass1(glm::value_ptr(mdl_mtrx));
         mapobj.rendermng->render_o_pass_s3(); // vykreslení stínů
         mapobj.rendermng->render_o_pass2(mdl_mtrx);
     }
 
     glm::mat4 cm_mat =
-            p_mtrx_texcm * // prvotní natočení cubemapy podle polohy slunce
-            glm::transpose(mdl_rot_mtrx); // inverze aktuální rotační matice, rotace podle aktuální polohy kamery
+        p_mtrx_texcm *                // prvotní natočení cubemapy podle polohy slunce
+        glm::transpose(mdl_rot_mtrx); // inverze aktuální rotační matice, rotace podle aktuální polohy kamery
     p_shadermng.set(ShaderUniMat4::TexMat, cm_mat);
 
     glActiveTexture(GL_TEXTURE0 + (int)ShaderUniTex::Cube);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, p_skycmtex); checkGL();
+    glBindTexture(GL_TEXTURE_CUBE_MAP, p_skycmtex);
+    checkGL();
     glActiveTexture(GL_TEXTURE0);
-
 
     glm::mat4 mdl_ms[4];
 
@@ -924,11 +999,12 @@ void Gamemng::render_frame(const glm::mat4& m)
     for (unsigned int i = 0; i != p_players; ++i)
     {
         mdl_ms[i] = glm::translate(m, glm::vec3(p_car2do[i].p_x0[1], 0.f, p_car2do[i].p_x0[0]));
-        mdl_ms[i] = glm::rotate(mdl_ms[i], glm::radians(p_car2do[i].p_ax0*57.29577951308232f), glm::vec3(0, 1, 0));
+        mdl_ms[i] = glm::rotate(mdl_ms[i], glm::radians(p_car2do[i].p_ax0 * 57.29577951308232f), glm::vec3(0, 1, 0));
         p_shadermng.set(ShaderUniMat4::ModelViewMat, mdl_ms[i]);
-        if (ge_bpass1)p_carrendermng[i].render_o_pass1(glm::value_ptr(mdl_ms[i])); // zjištění, zda jde auto vidět (přes 1 bounding sphere)
-        p_carrendermng[i].render_o_pass_s3(); // vykreslení stínů
-        p_carrendermng[i].render_o_pass2(mdl_ms[i]); // vykreslení 1. části modelu
+        if (ge_bpass1)
+            p_carrendermng[i].render_o_pass1(glm::value_ptr(mdl_ms[i])); // zjištění, zda jde auto vidět (přes 1 bounding sphere)
+        p_carrendermng[i].render_o_pass_s3();                            // vykreslení stínů
+        p_carrendermng[i].render_o_pass2(mdl_ms[i]);                     // vykreslení 1. části modelu
     }
     for (unsigned int i = 0; i != p_players; ++i)
     {
@@ -945,59 +1021,64 @@ void Gamemng::render_frame(const glm::mat4& m)
     if (p_isGhost && (p_ghostUpdated || p_ghostAvailable) && p_playerstate[0].lap_i_max > 0 && p_playerstate[0].lap_i_max <= p_laps) // rendering
     {
 
-
         bool useSampleCoverage = g_multisampleMode;
 
         if (useSampleCoverage)
         {
-            glSampleCoverage(0.5, GL_FALSE); checkGL();
-            glEnable(GL_SAMPLE_COVERAGE); checkGL();
+            glSampleCoverage(0.5, GL_FALSE);
+            checkGL();
+            glEnable(GL_SAMPLE_COVERAGE);
+            checkGL();
         }
         else
         {
             p_shadermng.set(ShaderUniInt::Halftone, (GLint)1);
         }
 
-        float framef = p_ghost_time*10.0;
+        float framef = p_ghost_time * 10.0;
         int framei = framef;
         float framej = framef - float(framei);
-        float framej1 = 1.0-framej;
-        int framei1 = framei+1;
+        float framej1 = 1.0 - framej;
+        int framei1 = framei + 1;
         float ghostX = 0, ghostY = 0, ghostA = 0;
         int visible = 0;
-        if (framei1 < p_ghostOld->m_num) {
+        if (framei1 < p_ghostOld->m_num)
+        {
             visible = 1;
-            ghostX = p_ghostOld->m_frames[framei*4+0]*framej1+p_ghostOld->m_frames[framei1*4+0]*framej;
-            ghostY = p_ghostOld->m_frames[framei*4+1]*framej1+p_ghostOld->m_frames[framei1*4+1]*framej;
-            ghostA = p_ghostOld->m_frames[framei*4+2]*framej1+p_ghostOld->m_frames[framei1*4+2]*framej;
+            ghostX = p_ghostOld->m_frames[framei * 4 + 0] * framej1 + p_ghostOld->m_frames[framei1 * 4 + 0] * framej;
+            ghostY = p_ghostOld->m_frames[framei * 4 + 1] * framej1 + p_ghostOld->m_frames[framei1 * 4 + 1] * framej;
+            ghostA = p_ghostOld->m_frames[framei * 4 + 2] * framej1 + p_ghostOld->m_frames[framei1 * 4 + 2] * framej;
 
             float angle_vector0 = std::cos(ghostA);
             float angle_vector1 = std::sin(ghostA);
 
-            float ghostdiffx = ghostX-p_ghost_x_prev[0];
-            float ghostdiffy = ghostY-p_ghost_x_prev[1];
+            float ghostdiffx = ghostX - p_ghost_x_prev[0];
+            float ghostdiffy = ghostY - p_ghost_x_prev[1];
 
-            p_ghost_wheel_rot += angle_vector0*ghostdiffx+angle_vector1*ghostdiffy;
+            p_ghost_wheel_rot += angle_vector0 * ghostdiffx + angle_vector1 * ghostdiffy;
 
             p_ghost_x_prev[0] = ghostX;
             p_ghost_x_prev[1] = ghostY;
         }
 
-        if (visible && (p_ghostAvailable || p_ghostUpdated)) {
+        if (visible && (p_ghostAvailable || p_ghostUpdated))
+        {
             glm::mat4 mdl_mtrx = glm::translate(m, glm::vec3(ghostY, 0.f, ghostX));
-            mdl_mtrx = glm::rotate(mdl_mtrx, glm::radians(ghostA*57.29577951308232f), glm::vec3(0.f, 1.f, 0.f));
+            mdl_mtrx = glm::rotate(mdl_mtrx, glm::radians(ghostA * 57.29577951308232f), glm::vec3(0.f, 1.f, 0.f));
 
             p_shadermng.set(ShaderUniMat4::ModelViewMat, mdl_mtrx);
 
-            if (ge_bpass1) p_ghostrendermng[p_ghostUpdated].render_o_pass1(glm::value_ptr(mdl_mtrx)); // zjištění, zda jde auto vidět (přes 1 bounding sphere)
-            p_ghostrendermng[p_ghostUpdated].render_o_pass_s3(); // vykreslení stínů
-            p_ghostrendermng[p_ghostUpdated].render_o_pass2(mdl_mtrx); // vykreslení 1. části modelu
+            if (ge_bpass1)
+                p_ghostrendermng[p_ghostUpdated].render_o_pass1(glm::value_ptr(mdl_mtrx)); // zjištění, zda jde auto vidět (přes 1 bounding sphere)
+            p_ghostrendermng[p_ghostUpdated].render_o_pass_s3();                           // vykreslení stínů
+            p_ghostrendermng[p_ghostUpdated].render_o_pass2(mdl_mtrx);                     // vykreslení 1. části modelu
             p_ghostrendermng[p_ghostUpdated].render_o_pass_glassTint(mdl_mtrx);
             p_ghostrendermng[p_ghostUpdated].render_o_pass_glassReflection(mdl_mtrx);
         }
         if (useSampleCoverage)
         {
-            glDisable(GL_SAMPLE_COVERAGE); checkGL();
+            glDisable(GL_SAMPLE_COVERAGE);
+            checkGL();
         }
         else
         {
@@ -1029,7 +1110,7 @@ void Gamemng::restart()
     if (p_reverse)
     {
         for (unsigned int i = 0; i != 4; ++i)
-            startpos[i*2] *= -1.f; // otočí se x (souřadnice pozic)
+            startpos[i * 2] *= -1.f; // otočí se x (souřadnice pozic)
     }
     float startang = p_reverse ? float(M_PI) : 0.f;
     unsigned int startpos_i[4];
@@ -1046,7 +1127,7 @@ void Gamemng::restart()
     case 3:
         startpos_i[0] = 0;
         startpos_i[1] = 1;
-        startpos_i[2] = 2+randn1(2);
+        startpos_i[2] = 2 + randn1(2);
         randn1mix(startpos_i, sizeof(unsigned int), 3);
         break;
     default:
@@ -1059,8 +1140,8 @@ void Gamemng::restart()
 
     for (unsigned int i = 0; i != 4; ++i) // p?esun aut na start
     {
-        startpos[i*2+0] += p_map_model->p_cen[3+2];
-        startpos[i*2+1] += p_map_model->p_cen[3+0];
+        startpos[i * 2 + 0] += p_map_model->p_cen[3 + 2];
+        startpos[i * 2 + 1] += p_map_model->p_cen[3 + 0];
     }
 
     for (unsigned int i = 0; i != p_players; ++i)
@@ -1069,7 +1150,7 @@ void Gamemng::restart()
         p_car2do[i].p_av = 0.f;
 
         p_car2do[i].p_ax = startang;
-        memcpy(p_car2do[i].p_x, startpos+startpos_i[i]*2, 2*sizeof(float));
+        memcpy(p_car2do[i].p_x, startpos + startpos_i[i] * 2, 2 * sizeof(float));
 
         float car_max_x = 0.f;
         for (unsigned int j = 0; j != p_car2do[i].p_bbox_sz; ++j)
@@ -1116,37 +1197,40 @@ void Gamemng::restart()
     {
         p_particles[i].clear();
     }
-    glClear (GL_COLOR_BUFFER_BIT); checkGL();
+    glClear(GL_COLOR_BUFFER_BIT);
+    checkGL();
     SDL_GL_SwapWindow(gameWindow);
-    glClear (GL_COLOR_BUFFER_BIT); checkGL();
+    glClear(GL_COLOR_BUFFER_BIT);
+    checkGL();
     SDL_GL_SwapWindow(gameWindow);
-    glClear (GL_COLOR_BUFFER_BIT); checkGL();
+    glClear(GL_COLOR_BUFFER_BIT);
+    checkGL();
 }
 
 void Gamemng::set_proj_mtrx()
 {
-    p_proj_mtrx0 = glm::frustum(-p_frust[0]*p_frust[2], p_frust[0]*p_frust[2],
-            -p_frust[1]*p_frust[2], p_frust[1]*p_frust[2], p_frust[2], p_frust[3]);
+    p_proj_mtrx0 = glm::frustum(-p_frust[0] * p_frust[2], p_frust[0] * p_frust[2],
+                                -p_frust[1] * p_frust[2], p_frust[1] * p_frust[2], p_frust[2], p_frust[3]);
     switch (p_players)
     {
     case 1:
-        p_proj_mtrx[0] = glm::frustum(-p_frust[0]*p_frust[2], p_frust[0]*p_frust[2],
-                -p_frust[1]*p_frust[2], p_frust[1]*p_frust[2], p_frust[2], p_frust[3]);
+        p_proj_mtrx[0] = glm::frustum(-p_frust[0] * p_frust[2], p_frust[0] * p_frust[2],
+                                      -p_frust[1] * p_frust[2], p_frust[1] * p_frust[2], p_frust[2], p_frust[3]);
         break;
     case 2:
-        p_proj_mtrx[0] = glm::frustum(-p_frust[0]*p_frust[2]*2, p_frust[0]*p_frust[2]*2,
-                -p_frust[1]*p_frust[2], p_frust[1]*p_frust[2]*3, p_frust[2], p_frust[3]);
-        p_proj_mtrx[1] = glm::frustum(-p_frust[0]*p_frust[2]*2, p_frust[0]*p_frust[2]*2,
-                -p_frust[1]*p_frust[2]*3, p_frust[1]*p_frust[2], p_frust[2], p_frust[3]);
+        p_proj_mtrx[0] = glm::frustum(-p_frust[0] * p_frust[2] * 2, p_frust[0] * p_frust[2] * 2,
+                                      -p_frust[1] * p_frust[2], p_frust[1] * p_frust[2] * 3, p_frust[2], p_frust[3]);
+        p_proj_mtrx[1] = glm::frustum(-p_frust[0] * p_frust[2] * 2, p_frust[0] * p_frust[2] * 2,
+                                      -p_frust[1] * p_frust[2] * 3, p_frust[1] * p_frust[2], p_frust[2], p_frust[3]);
         break;
     default: // 2 a 3
-        p_proj_mtrx[0] = glm::frustum(-p_frust[0]*p_frust[2], p_frust[0]*p_frust[2]*3,
-                -p_frust[1]*p_frust[2], p_frust[1]*p_frust[2]*3, p_frust[2], p_frust[3]);
-        p_proj_mtrx[1] = glm::frustum(-p_frust[0]*p_frust[2], p_frust[0]*p_frust[2]*3,
-                -p_frust[1]*p_frust[2]*3, p_frust[1]*p_frust[2], p_frust[2], p_frust[3]);
-        p_proj_mtrx[2] = glm::frustum(-p_frust[0]*p_frust[2]*3, p_frust[0]*p_frust[2],
-                -p_frust[1]*p_frust[2], p_frust[1]*p_frust[2]*3, p_frust[2], p_frust[3]);
-        p_proj_mtrx[3] = glm::frustum(-p_frust[0]*p_frust[2]*3, p_frust[0]*p_frust[2],
-                -p_frust[1]*p_frust[2]*3, p_frust[1]*p_frust[2], p_frust[2], p_frust[3]);
+        p_proj_mtrx[0] = glm::frustum(-p_frust[0] * p_frust[2], p_frust[0] * p_frust[2] * 3,
+                                      -p_frust[1] * p_frust[2], p_frust[1] * p_frust[2] * 3, p_frust[2], p_frust[3]);
+        p_proj_mtrx[1] = glm::frustum(-p_frust[0] * p_frust[2], p_frust[0] * p_frust[2] * 3,
+                                      -p_frust[1] * p_frust[2] * 3, p_frust[1] * p_frust[2], p_frust[2], p_frust[3]);
+        p_proj_mtrx[2] = glm::frustum(-p_frust[0] * p_frust[2] * 3, p_frust[0] * p_frust[2],
+                                      -p_frust[1] * p_frust[2], p_frust[1] * p_frust[2] * 3, p_frust[2], p_frust[3]);
+        p_proj_mtrx[3] = glm::frustum(-p_frust[0] * p_frust[2] * 3, p_frust[0] * p_frust[2],
+                                      -p_frust[1] * p_frust[2] * 3, p_frust[1] * p_frust[2], p_frust[2], p_frust[3]);
     }
 }

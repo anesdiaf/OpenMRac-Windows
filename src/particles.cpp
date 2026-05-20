@@ -15,7 +15,7 @@ bool Particle::step(float deltaT)
     float deccelerationSize = 1.f;
 
     glm::vec3 decceleration(velocity[0], velocity[1], velocity[2]);
-    glm::normalize(decceleration);
+    decceleration = glm::normalize(decceleration);
     for (int i = 0; i != 3; ++i)
     {
         decceleration[i] *= deccelerationSize * deltaT;
@@ -40,7 +40,7 @@ void Particles::step(float deltaT)
 {
     for (unsigned i = 0; i < m_particleContainer.size(); ++i)
     {
-        Particle& particle = m_particleContainer[i];
+        Particle &particle = m_particleContainer[i];
         bool existsAfterStep = particle.step(deltaT);
         if (!existsAfterStep)
         {
@@ -54,7 +54,7 @@ void Particles::step(float deltaT)
     ++m_stepCounter;
 }
 
-void Particles::newParticle(const Particle& particle)
+void Particles::newParticle(const Particle &particle)
 {
     m_particleContainer.push_back(particle);
 }
